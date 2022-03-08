@@ -1,9 +1,7 @@
-import glob
 import cv2
 import numpy as np
 import torch
-from torch.utils.data import Dataset, DataLoader
-
+from torch.utils.data import Dataset
 
 class InstantiateDataset(Dataset):
 	def __init__(self, img_path, class_name):

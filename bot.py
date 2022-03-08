@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import neural_network
 import dataset_instantiate
+import testing
 
 if __name__ == "__main__":
 
@@ -23,27 +24,6 @@ if __name__ == "__main__":
         net.eval()
     except:
         pass
-
-    def test_loop(dataloader, model):
-        net.eval()
-
-        dataiter = iter(dataloader)
-        images, labels = dataiter.next()
-
-        x = None
-
-        print(' '.join(f'{classes[labels[j]]:5s}' for j in range(1)))
-
-        with torch.no_grad():
-            for data in dataloader:
-                images, labels = data[0].to(device), data[1].to(device)
-                outputs = model(images)
-                _, predictions = torch.max(outputs, 1)
-
-                for label, prediction in zip(labels, predictions):
-                    x = classes[prediction]
-
-        return x
 
     @client.event
     async def on_ready():
@@ -70,10 +50,11 @@ if __name__ == "__main__":
                         out_file.write(r.content)
                         await message.channel.send("New image created successfully!")
 
-                    res = test_loop(torch.utils.data.DataLoader(dataset_instantiate.InstantiateDataset(f"data/bot/image{rnum}.jpg", "car"), batch_size=1, shuffle=True, num_workers=2), net)
+                    res_dataset = dataset_instantiate.InstantiateDataset(f"data/bot/image{rnum}.jpg", "car")
+                    res_data = torch.utils.data.DataLoader(res_dataset, batch_size=1, shuffle=True, num_workers=2)
+                    res = testing.test_set_disc(res_data, net, device, classes)
 
                     await message.channel.send(f"Prediction: {res}")
-                        
 
             except IndexError:
                 await message.channel.send("Please enter a valid image.")

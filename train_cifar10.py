@@ -7,6 +7,7 @@ import neural_network
 import torch.optim as optim
 import matplotlib.pyplot as plt
 import numpy as np
+import testing
 
 if __name__ == "__main__":
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -50,29 +51,11 @@ if __name__ == "__main__":
     except:
         pass
 
-    def train_loop(dataloader, model, loss_fn, optimizer):
-        model.train()
-        running_loss = 0.0
-        for batch, data in enumerate(dataloader, 0):
-            inputs, labels = data[0].to(device), data[1].to(device)
-
-            optimizer.zero_grad()
-
-            outputs = model(inputs)
-            loss = loss_fn(outputs, labels)
-            loss.backward()
-            optimizer.step()
-
-            running_loss += loss.item()
-            if batch % 2000 == 1999:
-                print(f'[{epoch + 1}, {batch + 1:5d}] loss: {running_loss / 2000:.3f}')
-                running_loss = 0.0
-
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=0.9)
 
     for epoch in range(epochs):
-        train_loop(trainloader, net, criterion, optimizer)
+        testing.train_set(trainloader, net, criterion, optimizer, device, epoch)
     print("Finished Training")
 
     try:

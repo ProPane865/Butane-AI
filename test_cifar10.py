@@ -4,6 +4,7 @@ import torchvision
 import torchvision.transforms as transforms
 import numpy as np
 import neural_network
+import testing
 
 if __name__ == "__main__":
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -54,41 +55,6 @@ if __name__ == "__main__":
     except:
         pass
 
-    def imshow(img):
-        img = img / 2 + 0.5
-        npimg = img.numpy()
-        plt.imshow(np.transpose(npimg, (1, 2, 0)))
-        plt.show()
-
-    def test_loop(dataloader, model):
-        dataiter = iter(dataloader)
-        images, labels = dataiter.next()
-
-        imshow(torchvision.utils.make_grid(images))
-        print(' '.join(f'{classes[labels[j]]:5s}' for j in range(batch_size)))
-
-        correct_pred = {classname: 0 for classname in classes}
-        total_pred = {classname: 0 for classname in classes}
-
-        with torch.no_grad():
-            for data in dataloader:
-                images, labels = data[0].to(device), data[1].to(device)
-                outputs = model(images)
-                _, predictions = torch.max(outputs, 1)
-
-                for label, prediction in zip(labels, predictions):
-                    if label == prediction:
-                        correct_pred[classes[label]] += 1
-                    total_pred[classes[label]] += 1
-
-        overall_accuracy = 0
-
-        for classname, correct_count in correct_pred.items():
-            accuracy = 100 * float(correct_count) / total_pred[classname]
-            print(f"Accuracy for class: {classname:5s} is {accuracy:.1f} %")
-            overall_accuracy += accuracy / len(correct_pred.items())
-        print(f"Overall accuracy is: {overall_accuracy:.1f} %")
-
-    test_loop(testloader, net)
-    test_loop(trainloader, net)
+    testing.test_set(testloader, net, device, classes, batch_size)
+    testing.test_set(trainloader, net, device, classes, batch_size)
     print("Finished Testing")
