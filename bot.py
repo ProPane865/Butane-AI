@@ -6,8 +6,15 @@ import torch
 import neural_network
 import dataset_instantiate
 import testing
+import os
 
 if __name__ == "__main__":
+
+    if not os.path.exists("./data"):
+        os.makedirs("./data")
+
+        if not os.path.exists("./data/bot"):
+            os.makedirs("./data/bot")
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print(device)
