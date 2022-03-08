@@ -78,4 +78,4 @@ if __name__ == "__main__":
             except IndexError:
                 await message.channel.send("Please enter a valid image.")
 
-    client.run("INSERT TOKEN HERE")
+    client.run(open("token", "r").read())
