@@ -10,6 +10,7 @@ import os
 import torch.nn as nn
 import torch.optim as optim
 import pickle
+import glob
 
 if __name__ == "__main__":
 
@@ -93,8 +94,17 @@ if __name__ == "__main__":
             optimizer = optim.SGD(net.parameters(), lr=1e-3, momentum=0.9)
 
             for epoch in range(14):
-                testing.train_set(ds_loader, net, criterion, optimizer, device, epoch)
+                testing.train_set_disc(ds_loader, net, criterion, optimizer, device, epoch)
 
-            await message.client.send("Finished training using cached data")
+            open("datasets", "w").close()
+            itemlist = []
+
+            dir = "./data/bot"
+            filelist = glob.glob(os.path.join(dir, "*"))
+
+            for f in filelist:
+                os.remove(f)
+
+            await message.channel.send("Finished training using cached data")
 
     client.run(open("token", "r").read())

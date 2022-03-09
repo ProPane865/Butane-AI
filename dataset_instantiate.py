@@ -1,7 +1,8 @@
-import cv2
 import numpy as np
 import torch
 from torch.utils.data import Dataset
+from PIL import Image
+from torchvision import transforms
 
 class InstantiateDataset(Dataset):
 	def __init__(self, img_path, class_name):
@@ -17,10 +18,9 @@ class InstantiateDataset(Dataset):
 
 	def __getitem__(self, idx):
 		img_path, class_name = self.data[idx]
-		img = cv2.imread(img_path)
-		img = cv2.resize(img, self.img_dim)
+		img = Image.open(img_path).convert("RGB")
+		img = img.resize(self.img_dim)
 		class_id = self.class_map[class_name]
-		img_tensor = torch.from_numpy(img).type(torch.FloatTensor)
-		img_tensor = img_tensor.permute(2, 0, 1)
+		img_tensor = transforms.ToTensor()(img)
 		class_id = torch.tensor([class_id])
 		return img_tensor, class_id

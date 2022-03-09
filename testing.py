@@ -78,3 +78,19 @@ def test_set_disc(dataloader, model, device, classes):
                 x = classes[prediction]
 
     return x
+
+def train_set_disc(dataloader, model, loss_fn, optimizer, device, epoch):
+    model.train()
+    running_loss = 0.0
+    for batch, data in enumerate(dataloader, 0):
+        inputs, labels = data[0].to(device), data[1].to(device)
+
+        optimizer.zero_grad()
+
+        outputs = model(inputs)
+        loss = loss_fn(outputs, torch.max(labels, 1)[0])
+        loss.backward()
+        optimizer.step()
+
+        running_loss += loss.item()
+    return running_loss
