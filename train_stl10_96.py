@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     batch_size = 4
     learning_rate = 1e-3
-    epochs = 7
+    epochs = 14
 
     trainset_a = torchvision.datasets.STL10(root='./predata_sets/96', download=True, transform=transform_a)
     trainset_b = torchvision.datasets.STL10(root='./predata_sets/96', download=True, transform=transform_b)

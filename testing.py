@@ -12,7 +12,7 @@ def train_set(dataloader, model, loss_fn, optimizer, device, epoch):
         optimizer.zero_grad()
 
         outputs = model(inputs)
-        loss = loss_fn(outputs, labels)
+        loss = loss_fn(outputs, torch.max(labels, 1))
         loss.backward()
         optimizer.step()
 
