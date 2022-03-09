@@ -9,8 +9,8 @@ class InstantiateDataset(Dataset):
 		self.data = []
 		self.data.append([img_path, class_name])
 		print(self.data)
-		self.class_map = {"plane": 0, "car": 1, "bird": 2, "cat": 3, "deer": 4, "dog": 5, "frog": 6, "horse": 7, "ship": 8, "truck": 9}
-		self.img_dim = (32, 32)
+		self.class_map = {"airplane": 0, "bird": 1, "car": 2, "cat": 3, "deer": 4, "dog": 5, "horse": 6, "monkey": 7, "ship": 8, "truck": 9}
+		self.img_dim = (96, 96)
 	
 	def __len__(self):
 		return len(self.data)
