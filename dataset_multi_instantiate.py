@@ -17,7 +17,7 @@ def square(img, bg_color):
         result.paste(img, ((height - width) // 2, 0))
         return result
 
-class InstantiateDatasetAug0(Dataset):
+class InstantiateMultiDatasetAug0(Dataset):
 	def __init__(self, img_path, class_name):
 		self.imgs_path = str(img_path)
 		self.data = []
@@ -39,7 +39,7 @@ class InstantiateDatasetAug0(Dataset):
 		class_id = torch.tensor([class_id])
 		return img_tensor, class_id
 
-class InstantiateDatasetAug1(Dataset):
+class InstantiateMultiDatasetAug1(Dataset):
 	def __init__(self, img_path, class_name):
 		self.imgs_path = str(img_path)
 		self.data = []
@@ -63,7 +63,7 @@ class InstantiateDatasetAug1(Dataset):
 		class_id = torch.tensor([class_id])
 		return img_tensor, class_id
 
-class InstantiateDatasetAug2(Dataset):
+class InstantiateMultiDatasetAug2(Dataset):
 	def __init__(self, img_path, class_name):
 		self.imgs_path = str(img_path)
 		self.data = []

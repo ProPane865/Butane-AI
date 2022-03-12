@@ -2,17 +2,17 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-class NeuralNetwork96(nn.Module):
+class NeuralNetwork32(nn.Module):
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(3, 6, 6)
-        self.conv2 = nn.Conv2d(6, 16, 9)
-        self.conv3 = nn.Conv2d(16, 64, 12)
-        self.conv4 = nn.Conv2d(64, 256, 15)
+        self.conv1 = nn.Conv2d(3, 6, 2)
+        self.conv2 = nn.Conv2d(6, 16, 3)
+        self.conv3 = nn.Conv2d(16, 64, 4)
+        self.conv4 = nn.Conv2d(64, 256, 5)
 
         self.pool1 = nn.MaxPool2d(1, 1)
 
-        self.fc1 = nn.Linear(861184, 120)
+        self.fc1 = nn.Linear(123904, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
