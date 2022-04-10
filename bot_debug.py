@@ -1,4 +1,5 @@
 import discord
+import traceback
 from discord.ext import commands
 from matplotlib import image
 import requests
@@ -53,18 +54,19 @@ if __name__ == "__main__":
     @bot.event
     async def on_ready():
         print("Logged in as {0.user}".format(bot))
+        print("The bot is running in DEBUG mode!")
 
     @bot.command(name="testcommand")
     async def testcommand(ctx):
+        await ctx.send("The bot is running in DEBUG mode!")
         await ctx.send("testcommand response")
 
     @bot.command(name="traindata")
-    async def traindata(ctx):
+    async def traindata(ctx, itemlist=itemlist):
         if ctx.message.author.id in [343239616435847170, 864572010574118932]:
 
             try:
                 with open("datasets", "rb") as fp:
-                    global itemlist
                     itemlist = pickle.load(fp)
                     ds = torch.utils.data.ConcatDataset(itemlist)
                     ds_loader = torch.utils.data.DataLoader(ds, batch_size=1, shuffle=True, num_workers=2)
@@ -102,10 +104,9 @@ if __name__ == "__main__":
             await ctx.send("You do not have permission to use that command")
 
     @bot.command(name="clearcache")
-    async def clearcache(ctx):
+    async def clearcache(ctx, itemlist=itemlist):
         if ctx.message.author.id in [343239616435847170, 864572010574118932]:
 
-            global itemlist
             itemlist = []
             with open("datasets", "wb") as fp:
                 pickle.dump(itemlist, fp)
@@ -122,30 +123,28 @@ if __name__ == "__main__":
             await ctx.send("You do not have permission to use that command")
 
     @bot.command(name="cache")
-    async def cache(ctx):
+    async def cache(ctx, itemlist=itemlist):
         if ctx.message.author.id in [343239616435847170, 864572010574118932]:
 
             try:
                 with open("datasets", "rb") as fp:
-                    global itemlist
                     itemlist = pickle.load(fp)
                     item_len = len(itemlist)
 
                 await ctx.send(f"There are currently {item_len} items in the cache")
 
             except:
-                await ctx.send("The cache is currently empty")
+                await ctx.send(traceback.format_exc())
 
         else:
             await ctx.send("You do not have permission to use that command")
 
     @bot.command(name="undocache")
-    async def undocache(ctx):
+    async def undocache(ctx, itemlist=itemlist):
         if ctx.message.author.id in [343239616435847170, 864572010574118932]:
 
             try:
                 with open("datasets", "rb") as fp:
-                    global itemlist
                     itemlist = pickle.load(fp)
 
                 for i in range(3):
@@ -157,13 +156,13 @@ if __name__ == "__main__":
                 await ctx.send("Removed last item from cache")
 
             except:
-                await ctx.send("The cache is currently empty")
+                await ctx.send(traceback.format_exc())
 
         else:
             await ctx.send("You do not have permission to use that command")
 
     @bot.command(name="evaluate")
-    async def evaluate(ctx, label):
+    async def evaluate(ctx, label, itemlist=itemlist):
         try:
             print(str(ctx.message.attachments[0]))
             if str(ctx.message.attachments[0])[0:26] == "https://cdn.discordapp.com":
@@ -182,7 +181,6 @@ if __name__ == "__main__":
                 res_data = torch.utils.data.DataLoader(res_dataset, batch_size=1, shuffle=True, num_workers=2)
                 res = testing.test_set_disc(res_data, net, device, classes)
 
-                global itemlist
                 itemlist.append(res_dataset0)
                 itemlist.append(res_dataset1)
                 itemlist.append(res_dataset2)
@@ -193,7 +191,7 @@ if __name__ == "__main__":
                 await ctx.send(f"Prediction: {res}")
 
         except IndexError:
-            await ctx.send("Please enter a valid image.")
+            await ctx.send(traceback.format_exc())
 
     @bot.command(name="scrape")
     async def scrape(ctx, data, size):
