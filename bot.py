@@ -7,6 +7,7 @@ import numpy as np
 import torch
 import neural_network
 import dataset_instantiate
+import dataset_multi_instantiate
 import testing
 import os
 import torch.nn as nn
@@ -196,14 +197,26 @@ if __name__ == "__main__":
             await ctx.send("Please enter a valid image.")
 
     @bot.command(name="scrape")
-    async def scrape(ctx, data, size):
+    async def scrape(ctx, data, traindata, size):
         if ctx.message.author.id in [343239616435847170, 864572010574118932]:
             await ctx.send(f"Scraping {size} '{data}' images...")
 
             scraper = image_scraper.ImageScraper("./data/scrape")
-            images = scraper.scrape(data, int(size))
+            images = scraper.scrape(data, traindata, int(size))
 
-            await ctx.send(f"Finished scraping {images} {data} images!")
+            scraped_dataset0 = dataset_multi_instantiate.InstantiateMultiDatasetAug0("data/scrape", traindata)
+            scraped_dataset1 = dataset_multi_instantiate.InstantiateMultiDatasetAug1("data/scrape", traindata)
+            scraped_dataset2 = dataset_multi_instantiate.InstantiateMultiDatasetAug2("data/scrape", traindata)
+
+            global itemlist
+            itemlist.append(scraped_dataset0)
+            itemlist.append(scraped_dataset1)
+            itemlist.append(scraped_dataset2)
+
+            with open("datasets", "wb") as fp:
+                pickle.dump(itemlist, fp)
+
+            await ctx.send(f"Finished scraping {images} {data} images for the {traindata} class!")
 
         else:
             await ctx.send("You do not have permission to use that command")

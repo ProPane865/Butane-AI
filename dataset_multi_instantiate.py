@@ -3,6 +3,7 @@ import torch
 from torch.utils.data import Dataset
 from PIL import Image
 from torchvision import transforms
+import glob
 
 def square(img, bg_color):
     width, height = img.size
@@ -18,10 +19,12 @@ def square(img, bg_color):
         return result
 
 class InstantiateMultiDatasetAug0(Dataset):
-	def __init__(self, img_path, class_name):
-		self.imgs_path = str(img_path)
+	def __init__(self, img_dir, class_name):
+		self.imgs_path = f"{str(img_dir)}/"
+		file_list = glob.glob(self.imgs_path + "*")
 		self.data = []
-		self.data.append([img_path, class_name])
+		for img_path in file_list:
+			self.data.append([img_path, class_name])
 		print(self.data)
 		self.class_map = {"airplane": 0, "bird": 1, "car": 2, "cat": 3, "deer": 4, "dog": 5, "horse": 6, "monkey": 7, "ship": 8, "truck": 9}
 		self.img_dim = (96, 96)
@@ -40,10 +43,12 @@ class InstantiateMultiDatasetAug0(Dataset):
 		return img_tensor, class_id
 
 class InstantiateMultiDatasetAug1(Dataset):
-	def __init__(self, img_path, class_name):
-		self.imgs_path = str(img_path)
+	def __init__(self, img_dir, class_name):
+		self.imgs_path = f"{str(img_dir)}/"
+		file_list = glob.glob(self.imgs_path + "*")
 		self.data = []
-		self.data.append([img_path, class_name])
+		for img_path in file_list:
+			self.data.append([img_path, class_name])
 		print(self.data)
 		self.class_map = {"airplane": 0, "bird": 1, "car": 2, "cat": 3, "deer": 4, "dog": 5, "horse": 6, "monkey": 7, "ship": 8, "truck": 9}
 		self.img_dim = (96, 96)
@@ -64,10 +69,12 @@ class InstantiateMultiDatasetAug1(Dataset):
 		return img_tensor, class_id
 
 class InstantiateMultiDatasetAug2(Dataset):
-	def __init__(self, img_path, class_name):
-		self.imgs_path = str(img_path)
+	def __init__(self, img_dir, class_name):
+		self.imgs_path = f"{str(img_dir)}/"
+		file_list = glob.glob(self.imgs_path + "*")
 		self.data = []
-		self.data.append([img_path, class_name])
+		for img_path in file_list:
+			self.data.append([img_path, class_name])
 		print(self.data)
 		self.class_map = {"airplane": 0, "bird": 1, "car": 2, "cat": 3, "deer": 4, "dog": 5, "horse": 6, "monkey": 7, "ship": 8, "truck": 9}
 		self.img_dim = (96, 96)
