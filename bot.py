@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     classes = ('airplane', 'bird', 'car', 'cat', 'deer', 'dog', 'horse', 'monkey', 'ship', 'truck')
 
-    net = neural_network.NeuralNetwork96().to(device)
+    net = neural_network.SpinalResNet18().to(device)
 
     try:
         net.load_state_dict(torch.load("./traindata/model_weights96.pth"))
@@ -58,40 +58,8 @@ if __name__ == "__main__":
     async def testcommand(ctx):
         await ctx.send("testcommand response")
 
-    @bot.command(name="evaluate")
-    async def evaluate(ctx, label):
-        try:
-            print(str(ctx.message.attachments[0]))
-            if str(ctx.message.attachments[0])[0:26] == "https://cdn.discordapp.com":
-                r = requests.get(str(ctx.message.attachments[0]), stream=True)
-
-                rnum = str(random.randrange(0, 3000))
-                
-                with open(f"data/bot/image{rnum}.jpg", "wb") as out_file:
-                    out_file.write(r.content)
-                    await ctx.send("New image created successfully!")
-
-                res_dataset0 = dataset_instantiate.InstantiateDatasetAug0(f"data/bot/image{rnum}.jpg", label)
-                res_dataset1 = dataset_instantiate.InstantiateDatasetAug1(f"data/bot/image{rnum}.jpg", label)
-                res_dataset2 = dataset_instantiate.InstantiateDatasetAug2(f"data/bot/image{rnum}.jpg", label)
-                res_dataset = torch.utils.data.ConcatDataset([res_dataset0, res_dataset1, res_dataset2])
-                res_data = torch.utils.data.DataLoader(res_dataset, batch_size=1, shuffle=True, num_workers=2)
-                res = testing.test_set_disc(res_data, net, device, classes)
-
-                itemlist.append(res_dataset0)
-                itemlist.append(res_dataset1)
-                itemlist.append(res_dataset2)
-
-                with open("datasets", "wb") as fp:
-                    pickle.dump(itemlist, fp)
-
-                await ctx.send(f"Prediction: {res}")
-
-        except IndexError:
-            await ctx.send("Please enter a valid image.")
-
     @bot.command(name="traindata")
-    async def traindata(ctx):
+    async def traindata(ctx, itemlist=itemlist):
         if ctx.message.author.id in [343239616435847170, 864572010574118932]:
 
             try:
@@ -132,7 +100,7 @@ if __name__ == "__main__":
             await ctx.send("You do not have permission to use that command")
 
     @bot.command(name="clearcache")
-    async def clearcache(ctx):
+    async def clearcache(ctx, itemlist=itemlist):
         if ctx.message.author.id in [343239616435847170, 864572010574118932]:
 
             open("datasets", "w").close()
@@ -150,7 +118,7 @@ if __name__ == "__main__":
             await ctx.send("You do not have permission to use that command")
 
     @bot.command(name="cache")
-    async def cache(ctx):
+    async def cache(ctx, itemlist=itemlist):
         if ctx.message.author.id in [343239616435847170, 864572010574118932]:
 
             try:
@@ -167,7 +135,7 @@ if __name__ == "__main__":
             await ctx.send("You do not have permission to use that command")
 
     @bot.command(name="undocache")
-    async def undocache(ctx):
+    async def undocache(ctx, itemlist=itemlist):
         if ctx.message.author.id in [343239616435847170, 864572010574118932]:
 
             try:
@@ -187,6 +155,38 @@ if __name__ == "__main__":
 
         else:
             await ctx.send("You do not have permission to use that command")
+
+    @bot.command(name="evaluate")
+    async def evaluate(ctx, label, itemlist=itemlist):
+        try:
+            print(str(ctx.message.attachments[0]))
+            if str(ctx.message.attachments[0])[0:26] == "https://cdn.discordapp.com":
+                r = requests.get(str(ctx.message.attachments[0]), stream=True)
+
+                rnum = str(random.randrange(0, 3000))
+                
+                with open(f"data/bot/image{rnum}.jpg", "wb") as out_file:
+                    out_file.write(r.content)
+                    await ctx.send("New image created successfully!")
+
+                res_dataset0 = dataset_instantiate.InstantiateDatasetAug0(f"data/bot/image{rnum}.jpg", label)
+                res_dataset1 = dataset_instantiate.InstantiateDatasetAug1(f"data/bot/image{rnum}.jpg", label)
+                res_dataset2 = dataset_instantiate.InstantiateDatasetAug2(f"data/bot/image{rnum}.jpg", label)
+                res_dataset = torch.utils.data.ConcatDataset([res_dataset0, res_dataset1, res_dataset2])
+                res_data = torch.utils.data.DataLoader(res_dataset, batch_size=1, shuffle=True, num_workers=2)
+                res = testing.test_set_disc(res_data, net, device, classes)
+
+                itemlist.append(res_dataset0)
+                itemlist.append(res_dataset1)
+                itemlist.append(res_dataset2)
+
+                with open("datasets", "wb") as fp:
+                    pickle.dump(itemlist, fp)
+
+                await ctx.send(f"Prediction: {res}")
+
+        except IndexError:
+            await ctx.send("Please enter a valid image.")
 
     @bot.command(name="scrape")
     async def scrape(ctx, data, size):
