@@ -118,7 +118,7 @@ class SpinalResNet(nn.Module):
         return out
 
 def SpinalResNet18():
-    return SpinalResNet(BasicBlock, [2,2,2,2])
+    return SpinalResNet(BasicBlock, [2, 2, 2, 2])
 
 def SpinalResNet34():
     return SpinalResNet(BasicBlock, [3, 4, 6, 3])

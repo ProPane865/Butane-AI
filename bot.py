@@ -1,28 +1,32 @@
 import discord
 from discord.ext import commands
-from matplotlib import image
 import requests
-import random
-import numpy as np
+
+from matplotlib import image
 import torch
-import neural_network
-import dataset_instantiate
-import dataset_multi_instantiate
-import testing
-import os
 import torch.nn as nn
 import torch.optim as optim
+
+import random
+import numpy as np
+
+import img_rec.neural_network
+import img_rec.dataset_instantiate
+import img_rec.dataset_multi_instantiate
+import img_rec.testing
+import img_rec.image_scraper
+
+import os
 import pickle
 import glob
-import image_scraper
 
 if __name__ == "__main__":
 
-    if not os.path.exists("./data"):
-        os.makedirs("./data")
+    if not os.path.exists("img_rec/data"):
+        os.makedirs("img_rec/data")
 
-        if not os.path.exists("./data/bot"):
-            os.makedirs("./data/bot")
+        if not os.path.exists("img_rec/data/bot"):
+            os.makedirs("img_rec/data/bot")
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print(device)
@@ -35,10 +39,10 @@ if __name__ == "__main__":
 
     classes = ('airplane', 'bird', 'car', 'cat', 'deer', 'dog', 'horse', 'monkey', 'ship', 'truck')
 
-    net = neural_network.SpinalResNet18().to(device)
+    net = img_rec.neural_network.SpinalResNet18().to(device)
 
     try:
-        net.load_state_dict(torch.load("./traindata/model_weights96.pth"))
+        net.load_state_dict(torch.load("img_rec/traindata/model_weights96.pth"))
         net.eval()
     except:
         pass
@@ -46,7 +50,7 @@ if __name__ == "__main__":
     itemlist = []
 
     try:
-        with open("datasets", "rb") as fp:
+        with open("img_rec/datasets", "rb") as fp:
             itemlist = pickle.load(fp)
     except:
         itemlist = []
@@ -64,7 +68,7 @@ if __name__ == "__main__":
         if ctx.message.author.id in [343239616435847170, 864572010574118932]:
 
             try:
-                with open("datasets", "rb") as fp:
+                with open("img_rec/datasets", "rb") as fp:
                     global itemlist
                     itemlist = pickle.load(fp)
                     ds = torch.utils.data.ConcatDataset(itemlist)
@@ -74,25 +78,25 @@ if __name__ == "__main__":
                 optimizer = optim.SGD(net.parameters(), lr=1e-3, momentum=0.9)
 
                 for epoch in range(14):
-                    testing.train_set_disc(ds_loader, net, criterion, optimizer, device, epoch)
+                    img_rec.testing.train_set_disc(ds_loader, net, criterion, optimizer, device, epoch)
 
                 itemlist = []
-                with open("datasets", "wb") as fp:
+                with open("img_rec/datasets", "wb") as fp:
                     pickle.dump(itemlist, fp)
 
-                dir = "./data/bot"
+                dir = "img_rec/data/bot"
                 filelist = glob.glob(os.path.join(dir, "*"))
 
                 for f in filelist:
                     os.remove(f)
 
                 try:
-                    torch.save(net.state_dict(), "./traindata/model_weights96.pth")
+                    torch.save(net.state_dict(), "img_rec/traindata/model_weights96.pth")
                 except:
-                    if not os.path.exists("./traindata"):
-                        os.makedirs("./traindata")
-                    open("./traindata/model_weights96.pth", "w+").close()
-                    torch.save(net.state_dict(), "./traindata/model_weights96.pth")
+                    if not os.path.exists("img_rec/traindata"):
+                        os.makedirs("img_rec/traindata")
+                    open("img_rec/traindata/model_weights96.pth", "w+").close()
+                    torch.save(net.state_dict(), "img_rec/traindata/model_weights96.pth")
 
                 await ctx.send("Finished training using cached data")
 
@@ -108,10 +112,10 @@ if __name__ == "__main__":
 
             global itemlist
             itemlist = []
-            with open("datasets", "wb") as fp:
+            with open("img_rec/datasets", "wb") as fp:
                 pickle.dump(itemlist, fp)
             
-            dir = "./data/bot"
+            dir = "img_rec/data/bot"
             filelist = glob.glob(os.path.join(dir, "*"))
 
             for f in filelist:
@@ -127,7 +131,7 @@ if __name__ == "__main__":
         if ctx.message.author.id in [343239616435847170, 864572010574118932]:
 
             try:
-                with open("datasets", "rb") as fp:
+                with open("img_rec/datasets", "rb") as fp:
                     global itemlist
                     itemlist = pickle.load(fp)
                     item_len = len(itemlist)
@@ -145,14 +149,14 @@ if __name__ == "__main__":
         if ctx.message.author.id in [343239616435847170, 864572010574118932]:
 
             try:
-                with open("datasets", "rb") as fp:
+                with open("img_rec/datasets", "rb") as fp:
                     global itemlist
                     itemlist = pickle.load(fp)
 
                 for i in range(3):
                     itemlist.pop()
 
-                with open("datasets", "wb") as fp:
+                with open("img_rec/datasets", "wb") as fp:
                     pickle.dump(itemlist, fp)
                     
                 await ctx.send("Removed last item from cache")
@@ -172,23 +176,23 @@ if __name__ == "__main__":
 
                 rnum = str(random.randrange(0, 3000))
                 
-                with open(f"data/bot/image{rnum}.jpg", "wb") as out_file:
+                with open(f"img_rec/data/bot/image{rnum}.jpg", "wb") as out_file:
                     out_file.write(r.content)
                     await ctx.send("New image created successfully!")
 
-                res_dataset0 = dataset_instantiate.InstantiateDatasetAug0(f"data/bot/image{rnum}.jpg", label)
-                res_dataset1 = dataset_instantiate.InstantiateDatasetAug1(f"data/bot/image{rnum}.jpg", label)
-                res_dataset2 = dataset_instantiate.InstantiateDatasetAug2(f"data/bot/image{rnum}.jpg", label)
+                res_dataset0 = img_rec.dataset_instantiate.InstantiateDatasetAug0(f"img_rec/data/bot/image{rnum}.jpg", label)
+                res_dataset1 = img_rec.dataset_instantiate.InstantiateDatasetAug1(f"img_rec/data/bot/image{rnum}.jpg", label)
+                res_dataset2 = img_rec.dataset_instantiate.InstantiateDatasetAug2(f"img_rec/data/bot/image{rnum}.jpg", label)
                 res_dataset = torch.utils.data.ConcatDataset([res_dataset0, res_dataset1, res_dataset2])
                 res_data = torch.utils.data.DataLoader(res_dataset, batch_size=1, shuffle=True, num_workers=2)
-                res = testing.test_set_disc(res_data, net, device, classes)
+                res = img_rec.testing.test_set_disc(res_data, net, device, classes)
 
                 global itemlist
                 itemlist.append(res_dataset0)
                 itemlist.append(res_dataset1)
                 itemlist.append(res_dataset2)
 
-                with open("datasets", "wb") as fp:
+                with open("img_rec/datasets", "wb") as fp:
                     pickle.dump(itemlist, fp)
 
                 await ctx.send(f"Prediction: {res}")
@@ -201,19 +205,19 @@ if __name__ == "__main__":
         if ctx.message.author.id in [343239616435847170, 864572010574118932]:
             await ctx.send(f"Scraping {size} '{data}' images...")
 
-            scraper = image_scraper.ImageScraper("./data/scrape")
+            scraper = img_rec.image_scraper.ImageScraper("img_rec/data/scrape")
             images = scraper.scrape(data, traindata, int(size))
 
-            scraped_dataset0 = dataset_multi_instantiate.InstantiateMultiDatasetAug0("data/scrape", traindata)
-            scraped_dataset1 = dataset_multi_instantiate.InstantiateMultiDatasetAug1("data/scrape", traindata)
-            scraped_dataset2 = dataset_multi_instantiate.InstantiateMultiDatasetAug2("data/scrape", traindata)
+            scraped_dataset0 = img_rec.dataset_multi_instantiate.InstantiateMultiDatasetAug0("img_rec/data/scrape", traindata)
+            scraped_dataset1 = img_rec.dataset_multi_instantiate.InstantiateMultiDatasetAug1("img_rec/data/scrape", traindata)
+            scraped_dataset2 = img_rec.dataset_multi_instantiate.InstantiateMultiDatasetAug2("img_rec/data/scrape", traindata)
 
             global itemlist
             itemlist.append(scraped_dataset0)
             itemlist.append(scraped_dataset1)
             itemlist.append(scraped_dataset2)
 
-            with open("datasets", "wb") as fp:
+            with open("img_rec/datasets", "wb") as fp:
                 pickle.dump(itemlist, fp)
 
             await ctx.send(f"Finished scraping {images} {data} images for the {traindata} class!")
